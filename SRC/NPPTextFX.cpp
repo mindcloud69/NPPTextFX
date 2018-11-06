@@ -106,7 +106,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#define NPP_UNICODE
+//#define NPP_UNICODE
 
 #ifdef NPP_UNICODE
 #define UNICODE	//load n++ interface in unicode mode
@@ -4005,7 +4005,7 @@ EXTERNC unsigned tidyHTML(char **dest,unsigned *destsz,unsigned *destlen,unsigne
           sln=output.size;
           *destsz=sln+1;
           rv=1;
-        } else MessageBox(g_nppData._nppHandle,"Out of memory in "PLUGIN_NAME" (not a HTMLtidy error)",PLUGIN_NAME, MB_OK|MB_ICONINFORMATION);
+        } else MessageBox(g_nppData._nppHandle,"Out of memory in " PLUGIN_NAME " (not a HTMLtidy error)",PLUGIN_NAME, MB_OK|MB_ICONINFORMATION);
         //freesafe(szPath,"tidyHTML");
         NPPGetSpecialFolderLocationarm(CSIDLX_TEXTFXTEMP,NULL,&szPath,&uPathSz,NULL,"HTMLTIDY.ERR");
         if (!(szPath/*=smprintfpath("%s%?\\%s%?\\%s",g_pszPluginpath,SUPPORT_PATH,"HTMLTIDY.ERR")*/)) goto tidyfree;
@@ -5307,7 +5307,7 @@ EXTERNC PFUNCPLUGINCMD pfswitchseltorectangular(void) {
 
 EXTERNC PFUNCPLUGINCMD pfhelp(void) {
   MessageBox(g_nppData._nppHandle,
-    "A Demo File NPP"PLUGIN_NAME"Demo.TXT was included with your distribution.\r\n"
+    "A Demo File NPP" PLUGIN_NAME "Demo.TXT was included with your distribution.\r\n"
     "Load this file and find the feature you need help on. A description and\r\n"
     "sample text is provided so you can see how each tool works. Read the entire\r\n"
     "demo file to get an idea of what all the tools do.",PLUGIN_NAME, MB_OK|MB_ICONINFORMATION);
@@ -6009,7 +6009,7 @@ EXTERNC void control_tidy(int stop) { // FALSE to start, TRUE to stop.
       EnableMenuItem(GetMenu(g_nppData._nppHandle), funcItem[findmenuitem(pfhtmltidy)]._cmdID, MF_BYCOMMAND);
       EnableMenuItem(GetMenu(g_nppData._nppHandle), funcItem[findmenuitem(pfmpxtidyrebuild)]._cmdID, MF_BYCOMMAND);
     } else { // Only disable the menu on startup. The menu may no longer be valid when exiting the DLL
-fail: if (errfunc) g_szTidyDLL_error=smprintf("Exported function %s not found in %s.\r\nThis "PLUGIN_NAME" build requires "TIDY_CALLQT" exports.",errfunc,"libTidy.dll");
+fail: if (errfunc) g_szTidyDLL_error=smprintf("Exported function %s not found in %s.\r\nThis " PLUGIN_NAME " build requires " TIDY_CALLQT " exports.",errfunc,"libTidy.dll");
       else g_szTidyDLL_error=smprintf("Unable to find %s in the system path\r\nor %s","libTidy.dll",szPath);
       EnableMenuItem(GetMenu(g_nppData._nppHandle), funcItem[findmenuitem(pfhtmltidy)]._cmdID, MF_BYCOMMAND | MF_GRAYED);
       EnableMenuItem(GetMenu(g_nppData._nppHandle), funcItem[findmenuitem(pfmpxtidyrebuild)]._cmdID, MF_BYCOMMAND | MF_GRAYED);
@@ -7670,7 +7670,7 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID lpvReserved) {
     if (!(g_fLoadonce=CreateFileMapping( (HANDLE) 0xFFFFFFFF, NULL,PAGE_READWRITE, 0,4,"Notepad++" PLUGIN_NAME))) return FALSE;
     // Windows automatically closes this FileMapping when the last owner quits.
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
-      MessageBox(0,"You can't load "PLUGIN_NAME" twice. Please delete the extra DLL in your Notepad ++ plugins folder",PLUGIN_NAME, MB_OK|MB_ICONINFORMATION);
+      MessageBox(0,"You can't load " PLUGIN_NAME " twice. Please delete the extra DLL in your Notepad ++ plugins folder",PLUGIN_NAME, MB_OK|MB_ICONINFORMATION);
       return(FALSE);
     }
 #if ENABLE_PUSHPOP
