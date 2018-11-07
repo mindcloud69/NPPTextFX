@@ -6662,7 +6662,11 @@ EXTERNC BOOL IsMenuItemChecked(HMENU hMenu,UINT uItem,BOOL fByPosition) {
 EXTERNC PFUNCPLUGINCMD pfbuildmenu(void) {
   struct _MENUWALK mx;
   mx.szBuf=NULL; mx.cbBuf=0;
+#ifdef _WIN64
+  if (cbMENUITEMINFO!=72) MessageBoxFree(0,smprintf("This compiler has the wrong size for MENUITEMINFO: %u, 72 required!",cbMENUITEMINFO),"Fatal Error",MB_OK);
+#else
   if (cbMENUITEMINFO!=44) MessageBoxFree(0,smprintf("This compiler has the wrong size for MENUITEMINFO: %u, 44 required!",cbMENUITEMINFO),"Fatal Error",MB_OK);
+#endif
 #if NPPDEBUG
     if (!powcheck(sizeof(struct _MENUMOVE)))
       MessageBoxFree(g_nppData._nppHandle,smprintf("sizeof(struct _MENUMOVE)==%u is not a power of two",sizeof(struct _MENUMOVE)),PLUGIN_NAME, MB_OK|MB_ICONWARNING);
