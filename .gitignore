@@ -17,8 +17,11 @@
 [Dd]ebug/
 [Dd]ebugPublic/
 [Dd]ebug\ Unicode/
+[Dd]ebug\ Unicode\ x64/
 [Rr]elease/
+[Rr]elease\ x64/
 [Rr]elease\ Unicode/
+[Rr]elease\ Unicode\ x64/
 [Rr]eleases/
 x64/
 x86/
