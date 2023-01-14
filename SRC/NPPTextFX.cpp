@@ -106,7 +106,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#define NPP_UNICODE
+//#define NPP_UNICODE
 
 #ifdef NPP_UNICODE
 #define UNICODE	//load n++ interface in unicode mode
@@ -431,7 +431,7 @@ doit:
      they are no longer valid. The next call will start *destlen at 0 and will attempt to allocate *destsz or strlen(source) bytes of memory depending on destlen
    maxlen is the maximum number of characters to copy from source, or (unsigned)-1 to copy all characters. */
 // someday we may need a strncpyarmfree() which frees source after it is used
-EXTERNC int strncpyarm(char **dest, size_t *destsz, size_t *destlen, const char *source, size_t maxlen
+EXTERNC int strncpyarm(char **dest, tsize_t *destsz, tsize_t *destlen, const char *source, size_t maxlen
 #if NPPDEBUG
 ,char *title
 #define strncpyarmsafe strncpyarm
@@ -468,7 +468,7 @@ EXTERNC int strncpyarm(char **dest, size_t *destsz, size_t *destlen, const char 
 }
 #undef THETITLE
 
-EXTERNC int memcpyarm(char **dest,size_t *destsz,size_t *destlen,const char *source,size_t slen
+EXTERNC int memcpyarm(char **dest,tsize_t *destsz,tsize_t *destlen,const char *source,size_t slen
 #if NPPDEBUG
 ,char *title
 #define memcpyarmsafe memcpyarm
@@ -501,7 +501,7 @@ EXTERNC int memcpyarm(char **dest,size_t *destsz,size_t *destlen,const char *sou
 }
 #undef THETITLE
 
-EXTERNC int memsetarm(char **dest,size_t *destsz,size_t *destlen,int chr,size_t slen
+EXTERNC int memsetarm(char **dest,tsize_t *destsz,tsize_t *destlen,int chr,size_t slen
 #if NPPDEBUG
 ,char *title
 #define memsetarmsafe memsetarm
@@ -542,7 +542,7 @@ EXTERNC int memsetarm(char **dest,size_t *destsz,size_t *destlen,int chr,size_t 
      * snprintfX() does not return the total number bytes that would be
          needed to store the entire string when there is not enough space
    If you need any of that functionality, you must call the real functions and deal with the bugs as vsarmprintf() does */
-EXTERNC size_t snprintfX(char *buffer,size_t buffersz,const char *format,...) {
+EXTERNC size_t snprintfX(char *buffer,tsize_t buffersz,const char *format,...) {
   size_t rv=0;
   va_list ap;
   if (buffer && buffersz) {
@@ -563,7 +563,7 @@ EXTERNC size_t snprintfX(char *buffer,size_t buffersz,const char *format,...) {
    smprintf() handles the broken vsnprintf() implementations that return -1 when there isn't enough space
      or ones that ensure or don't ensure a \0 at the end
    The v...() routines are rarely used directly. They are made so the non v routine wrappers and custom wrappers can be built.*/
-EXTERNC size_t vsarmprintf(char **dest,size_t *destsz,size_t *destlen,const char *format,va_list ap2) {
+EXTERNC size_t vsarmprintf(char **dest,tsize_t *destsz,tsize_t *destlen,const char *format,va_list ap2) {
   size_t vs=0,destlen1,destsz1=*destsz;
   char *dest1=*dest;
   va_list ap;
@@ -623,7 +623,7 @@ bottest:
   return(vs);
 }
 
-EXTERNC size_t sarmprintf(char **dest,size_t *destsz,size_t *destlen,const char *format,...) {
+EXTERNC size_t sarmprintf(char **dest,tsize_t *destsz,tsize_t *destlen,const char *format,...) {
   size_t rv;
   va_list ap;
   va_start(ap,format);
@@ -641,9 +641,9 @@ EXTERNC size_t sarmprintf(char **dest,size_t *destsz,size_t *destlen,const char 
 EXTERNC char *smprintf(const char *format,...) {
   char *rv=NULL;
 #if NPPDEBUG
-  size_t rvsz=0;
+  tsize_t rvsz=0;
 #else
-  size_t rvsz=256;
+  tsize_t rvsz=256;
 #endif
   va_list ap;
   va_start(ap,format);
@@ -791,7 +791,7 @@ default: goto pctch;
   return(tlen);
 }
 
-EXTERNC size_t sarmprintfpath(char **dest,size_t *destsz,size_t *destlen,const char *format,...) {
+EXTERNC size_t sarmprintfpath(char **dest,tsize_t *destsz,tsize_t *destlen,const char *format,...) {
   size_t rv;
   va_list ap;
   va_start(ap,format);
@@ -803,9 +803,9 @@ EXTERNC size_t sarmprintfpath(char **dest,size_t *destsz,size_t *destlen,const c
 EXTERNC char *smprintfpath(const char *format,...) {
   char *rv=NULL;
 #if NPPDEBUG
-  size_t rvsz=0;
+  tsize_t rvsz=0;
 #else
-  size_t rvsz=256;
+  tsize_t rvsz=256;
 #endif
   va_list ap;
   va_start(ap,format);
@@ -4005,7 +4005,7 @@ EXTERNC unsigned tidyHTML(char **dest,unsigned *destsz,unsigned *destlen,unsigne
           sln=output.size;
           *destsz=sln+1;
           rv=1;
-        } else MessageBox(g_nppData._nppHandle,"Out of memory in "PLUGIN_NAME" (not a HTMLtidy error)",PLUGIN_NAME, MB_OK|MB_ICONINFORMATION);
+        } else MessageBox(g_nppData._nppHandle,"Out of memory in " PLUGIN_NAME " (not a HTMLtidy error)",PLUGIN_NAME, MB_OK|MB_ICONINFORMATION);
         //freesafe(szPath,"tidyHTML");
         NPPGetSpecialFolderLocationarm(CSIDLX_TEXTFXTEMP,NULL,&szPath,&uPathSz,NULL,"HTMLTIDY.ERR");
         if (!(szPath/*=smprintfpath("%s%?\\%s%?\\%s",g_pszPluginpath,SUPPORT_PATH,"HTMLTIDY.ERR")*/)) goto tidyfree;
@@ -5307,7 +5307,7 @@ EXTERNC PFUNCPLUGINCMD pfswitchseltorectangular(void) {
 
 EXTERNC PFUNCPLUGINCMD pfhelp(void) {
   MessageBox(g_nppData._nppHandle,
-    "A Demo File NPP"PLUGIN_NAME"Demo.TXT was included with your distribution.\r\n"
+    "A Demo File NPP" PLUGIN_NAME "Demo.TXT was included with your distribution.\r\n"
     "Load this file and find the feature you need help on. A description and\r\n"
     "sample text is provided so you can see how each tool works. Read the entire\r\n"
     "demo file to get an idea of what all the tools do.",PLUGIN_NAME, MB_OK|MB_ICONINFORMATION);
@@ -6009,7 +6009,7 @@ EXTERNC void control_tidy(int stop) { // FALSE to start, TRUE to stop.
       EnableMenuItem(GetMenu(g_nppData._nppHandle), funcItem[findmenuitem(pfhtmltidy)]._cmdID, MF_BYCOMMAND);
       EnableMenuItem(GetMenu(g_nppData._nppHandle), funcItem[findmenuitem(pfmpxtidyrebuild)]._cmdID, MF_BYCOMMAND);
     } else { // Only disable the menu on startup. The menu may no longer be valid when exiting the DLL
-fail: if (errfunc) g_szTidyDLL_error=smprintf("Exported function %s not found in %s.\r\nThis "PLUGIN_NAME" build requires "TIDY_CALLQT" exports.",errfunc,"libTidy.dll");
+fail: if (errfunc) g_szTidyDLL_error=smprintf("Exported function %s not found in %s.\r\nThis " PLUGIN_NAME " build requires " TIDY_CALLQT " exports.",errfunc,"libTidy.dll");
       else g_szTidyDLL_error=smprintf("Unable to find %s in the system path\r\nor %s","libTidy.dll",szPath);
       EnableMenuItem(GetMenu(g_nppData._nppHandle), funcItem[findmenuitem(pfhtmltidy)]._cmdID, MF_BYCOMMAND | MF_GRAYED);
       EnableMenuItem(GetMenu(g_nppData._nppHandle), funcItem[findmenuitem(pfmpxtidyrebuild)]._cmdID, MF_BYCOMMAND | MF_GRAYED);
@@ -6178,8 +6178,8 @@ EXTERNC PFUNCPLUGINCMD pffindreplace(void) {
 // http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winui/winui/windowsuserinterface/windowing/windowprocedures/usingwindowprocedures.asp
 WNDPROC g_wpNPPOrigProc=NULL;
 // This init() is correct but I think g_wpNPPOrigProc should be set before SetWindowLong() sets the new proc. This would mean doing it in two steps.
-#define NPPSubclassProc_init() if (!g_wpNPPOrigProc /*&& g_usMinwID && g_usNextwID*/) g_wpNPPOrigProc=(WNDPROC)SetWindowLong(g_nppData._nppHandle,GWL_WNDPROC,(LONG)NPPSubclassProc)
-#define NPPSubclassProc_close() if (g_wpNPPOrigProc) do {SetWindowLong(g_nppData._nppHandle,GWL_WNDPROC,(LONG)g_wpNPPOrigProc); g_wpNPPOrigProc=NULL;} while(0)
+#define NPPSubclassProc_init() if (!g_wpNPPOrigProc /*&& g_usMinwID && g_usNextwID*/) g_wpNPPOrigProc=(WNDPROC)SetWindowLongPtr(g_nppData._nppHandle,GWLP_WNDPROC,(LONG_PTR)NPPSubclassProc)
+#define NPPSubclassProc_close() if (g_wpNPPOrigProc) do {SetWindowLongPtr(g_nppData._nppHandle,GWLP_WNDPROC,(LONG_PTR)g_wpNPPOrigProc); g_wpNPPOrigProc=NULL;} while(0)
 EXTERNC LRESULT APIENTRY NPPSubclassProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
   if (uMsg==WM_COMMAND) {
     WORD wParamLo=LOWORD(wParam),wParamHi=HIWORD(wParam);
@@ -6662,7 +6662,11 @@ EXTERNC BOOL IsMenuItemChecked(HMENU hMenu,UINT uItem,BOOL fByPosition) {
 EXTERNC PFUNCPLUGINCMD pfbuildmenu(void) {
   struct _MENUWALK mx;
   mx.szBuf=NULL; mx.cbBuf=0;
+#ifdef _WIN64
+  if (cbMENUITEMINFO!=72) MessageBoxFree(0,smprintf("This compiler has the wrong size for MENUITEMINFO: %u, 72 required!",cbMENUITEMINFO),"Fatal Error",MB_OK);
+#else
   if (cbMENUITEMINFO!=44) MessageBoxFree(0,smprintf("This compiler has the wrong size for MENUITEMINFO: %u, 44 required!",cbMENUITEMINFO),"Fatal Error",MB_OK);
+#endif
 #if NPPDEBUG
     if (!powcheck(sizeof(struct _MENUMOVE)))
       MessageBoxFree(g_nppData._nppHandle,smprintf("sizeof(struct _MENUMOVE)==%u is not a power of two",sizeof(struct _MENUMOVE)),PLUGIN_NAME, MB_OK|MB_ICONWARNING);
@@ -7667,10 +7671,10 @@ BOOL APIENTRY DllMain(HINSTANCE hInst, DWORD reason, LPVOID lpvReserved) {
     testmallocsafe();
 #endif
     osv.dwOSVersionInfoSize=sizeof(OSVERSIONINFO); GetVersionEx(&osv); g_fOnNT = osv.dwPlatformId == VER_PLATFORM_WIN32_NT;
-    if (!(g_fLoadonce=CreateFileMapping( (HANDLE) 0xFFFFFFFF, NULL,PAGE_READWRITE, 0,4,"Notepad++" PLUGIN_NAME))) return FALSE;
+    if (!(g_fLoadonce=CreateFileMapping( (HANDLE) INVALID_HANDLE_VALUE, NULL,PAGE_READWRITE, 0,4,"Notepad++" PLUGIN_NAME))) return FALSE;
     // Windows automatically closes this FileMapping when the last owner quits.
     if (GetLastError() == ERROR_ALREADY_EXISTS) {
-      MessageBox(0,"You can't load "PLUGIN_NAME" twice. Please delete the extra DLL in your Notepad ++ plugins folder",PLUGIN_NAME, MB_OK|MB_ICONINFORMATION);
+      MessageBox(0,"You can't load " PLUGIN_NAME " twice. Please delete the extra DLL in your Notepad ++ plugins folder",PLUGIN_NAME, MB_OK|MB_ICONINFORMATION);
       return(FALSE);
     }
 #if ENABLE_PUSHPOP

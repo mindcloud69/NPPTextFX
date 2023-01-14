@@ -17,7 +17,7 @@ See http://docs.notepad-plus-plus.org/index.php/TextFX%27s_Future for above stat
 # GitHub fork
 Regardless what's been said before, there are people who would like to continue using TextFX. As the project has been dead for 9 years, it was about time to do something about it.
 
-Original source code for version 0.25 (dated 2008) can be fround from https://sourceforge.net/projects/npp-plugins/files/TextFX/. That code can be made to build on modern Visual Studio and it supports Unicode, but 64-bit build is impossible.
+Original source code for version 0.25 (dated 2008) can be fround from https://sourceforge.net/projects/npp-plugins/files/TextFX/. That code can be made to build on modern Visual Studio and it supports Unicode, but 64-bit build is ~~impossible~~ now available.
 
 # Bugs
 
@@ -31,4 +31,3 @@ TextFX is distributed with Notepad++ but is not a part of Notepad++. Please do n
 (C) 2005-2007 GNU GPL http://www.gnu.org/copyleft/gpl.html
 Copyright (C)2003 Don HO ( donho@altern.org )
 NPPTextFX (C) 2005-2007 by Chris Severance
-

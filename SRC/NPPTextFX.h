@@ -14,6 +14,9 @@
 #define sprintf sprintf_unsafe
 #define strncpy strncpy_unsafe
 
+// Not the best way to solve this, but it works. Use this instead of size_t where previously 32-bit pointers have been used.
+typedef unsigned int tsize_t;
+
 #ifndef EXTERNC
 #ifdef __cplusplus
 #define EXTERNC extern "C"
@@ -93,7 +96,7 @@ EXTERNC int armrealloc(char **dest,unsigned *destsz,unsigned newsize,int strateg
 #endif
 );
 
-EXTERNC int strncpyarm(char **dest,size_t *destsz,size_t *destlen,const char *source,size_t maxlen
+EXTERNC int strncpyarm(char **dest,tsize_t *destsz,tsize_t *destlen,const char *source,size_t maxlen
 #undef THETITLE
 #if NPPDEBUG
 ,char *title
@@ -107,7 +110,7 @@ EXTERNC int strncpyarm(char **dest,size_t *destsz,size_t *destlen,const char *so
 #endif
 );
 
-EXTERNC int memcpyarm(char **dest,size_t *destsz,size_t *destlen,const char *source,size_t slen
+EXTERNC int memcpyarm(char **dest,tsize_t *destsz,tsize_t *destlen,const char *source,size_t slen
 #undef THETITLE
 #if NPPDEBUG
 ,char *title
@@ -119,7 +122,7 @@ EXTERNC int memcpyarm(char **dest,size_t *destsz,size_t *destlen,const char *sou
 #endif
 );
 
-EXTERNC int memsetarm(char **dest,size_t *destsz,size_t *destlen,int chr,size_t slen
+EXTERNC int memsetarm(char **dest,tsize_t *destsz,tsize_t *destlen,int chr,size_t slen
 #undef THETITLE
 #if NPPDEBUG
 ,char *title
@@ -132,12 +135,12 @@ EXTERNC int memsetarm(char **dest,size_t *destsz,size_t *destlen,int chr,size_t 
 );
 #undef THETITLE
 
-EXTERNC size_t snprintfX(char *buffer,size_t buffersz,const char *format,...);
-EXTERNC size_t vsarmprintf(char **dest,size_t *destsz,size_t *destlen,const char *format,va_list ap2);
-EXTERNC size_t sarmprintf(char **dest,size_t *destsz,size_t *destlen,const char *format,...);
+EXTERNC size_t snprintfX(char *buffer,tsize_t buffersz,const char *format,...);
+EXTERNC size_t vsarmprintf(char **dest,tsize_t *destsz,tsize_t *destlen,const char *format,va_list ap2);
+EXTERNC size_t sarmprintf(char **dest,tsize_t *destsz,tsize_t *destlen,const char *format,...);
 EXTERNC char *smprintf(const char *format,...);
 EXTERNC size_t vsarmprintfpath(char **dest,unsigned *destsz,unsigned *destlen,const char *format,va_list ap2);
-EXTERNC size_t sarmprintfpath(char **dest,size_t *destsz,size_t *destlen,const char *format,...);
+EXTERNC size_t sarmprintfpath(char **dest,tsize_t *destsz,tsize_t *destlen,const char *format,...);
 EXTERNC char *smprintfpath(const char *format,...);
 EXTERNC int MessageBoxFree(HWND hWnd,TCHAR *lpText,LPCTSTR lpCaption,UINT uType);
 EXTERNC int memmovearm(char **dest,unsigned *destsz,unsigned *destlen,char *destp,char *sourcep

@@ -1,16 +1,19 @@
 /* THIS FILE WAS ORIGINALLY BUILT BY DEV-C++ */
 #undef UNICODE
 #undef _UNICODE
+#define APSTUDIO_HIDDEN_SYMBOLS
 #include <windows.h>  /* include for version info constants */
+#include <prsht.h>
 #include "enable.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
 
 #if ENABLE_FINDREPLACE
 #include "poppad/poppad.rc"
 #endif
 
 1 VERSIONINFO
-FILEVERSION 0,2,4,0
-PRODUCTVERSION 0,2,4,0
+FILEVERSION 0,2,4,1
+PRODUCTVERSION 0,2,4,1
 FILETYPE VFT_DLL
 {
   BLOCK "StringFileInfo"
@@ -18,7 +21,7 @@ FILETYPE VFT_DLL
 		 BLOCK "040904E4"
 		 {
 			 VALUE "CompanyName", "Chris Severance"
-			 VALUE "FileVersion", "0.24a"
+			 VALUE "FileVersion", "0.24b"
 			 VALUE "FileDescription", "TextFX plugin for Notepad++"
 			 VALUE "InternalName", "NPPTextFX"
 			 VALUE "LegalCopyright", "(C) 2005-2007 GNU GPL"

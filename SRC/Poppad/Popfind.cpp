@@ -163,8 +163,9 @@ static void GetWindowTextUTF8arm(HWND hwndEditor,HWND hwndControl,char **ppBufA,
     SENDMSGTOED(hwndControl, SCI_SETEOLMODE, iEolMode, 0);
     SENDMSGTOED(hwndControl, SCI_CONVERTEOLS, iEolMode, 0);
   }
-  size_t uBufLenA=SENDMSGTOED(hwndControl, SCI_GETLENGTH, 0, 0)+1;
-  armreallocsafe(ppBufA,puBufsz,uBufLenA,ARMSTRATEGY_MAINTAIN,0,"strdupGetWindowText");
+  tsize_t uBufLenA=SENDMSGTOED(hwndControl, SCI_GETLENGTH, 0, 0)+1, tuBufsz=puBufsz?*puBufsz:0, tuBufLenA=puBufLenA?*puBufLenA:0;
+  armreallocsafe(ppBufA,&tuBufsz,tuBufLenA,ARMSTRATEGY_MAINTAIN,0,"strdupGetWindowText");
+  if (puBufsz) *puBufsz = tuBufsz;
   if (*ppBufA) *puBufLenA=SENDMSGTOED(hwndControl, SCI_GETTEXT, uBufLenA, *ppBufA);
 }
 
@@ -585,7 +586,7 @@ static void UICenterDialog(LPFINDREPLACEX pfr) {
 // this DlgProc is substantially less buggy than Windows own for FindText/ReplaceText
 // In here we try to minimize editor specific stuff and only perform things that apply generally to F&R dialogs.
 // Editor specific stuff goes into cbFindReplaceX. This separation will help both routines to be more readable.
-static BOOL CALLBACK FindReplaceDlgProc(HWND hDlg, UINT message,WPARAM wParam, LPARAM lParam) {
+static INT_PTR CALLBACK FindReplaceDlgProc(HWND hDlg, UINT message,WPARAM wParam, LPARAM lParam) {
   static FINDREPLACEX *pfr=NULL; // not thread safe but fairly easy to fix with a storage stack
   static unsigned cyClientHeight,cyOrigWindowHeight;
 
@@ -896,9 +897,9 @@ static BOOL CALLBACK FindReplaceDlgProc(HWND hDlg, UINT message,WPARAM wParam, L
 #endif
       break;
     case IDC_PSHSWAP: {
-        char *szBufRepl=NULL; unsigned uBufReplSz=0,uBufReplLen;
+        char *szBufRepl=NULL; size_t uBufReplSz=0,uBufReplLen;
         GetWindowTextUTF8arm(NULL,GetDlgItem(hDlg,IDC_EDTREPLACE),&szBufRepl,&uBufReplSz,&uBufReplLen); if (!szBufRepl) break;
-        char *szBufFind=NULL; unsigned uBufFindSz=0,uBufFindLen;
+        char *szBufFind=NULL; size_t uBufFindSz=0,uBufFindLen;
         GetWindowTextUTF8arm(NULL,GetDlgItem(hDlg,IDC_EDTFIND),&szBufFind,&uBufFindSz,&uBufFindLen);
         if (szBufFind) {
           SetWindowTextUTF8(pfr,GetDlgItem(hDlg,IDC_EDTFIND),szBufRepl,uBufReplLen,-1);
@@ -1357,7 +1358,7 @@ static int __cdecl PopFindReplaceCallback(unsigned uCommand,LPFINDREPLACEX pVoid
       if (pfr->PersistentFlags&FRP_SELECTED) CheckFlags(pfr->hwndSelf,pfr);
     }
     g_hDlg=pfr->hwndSelf;
-    g_wpScintillaOrigProc1=(WNDPROC)SetWindowLong(GetDlgItem(pfr->hwndSelf,IDC_EDTFIND),GWL_WNDPROC,(LONG)ScintillaSubclassProc1);
+    g_wpScintillaOrigProc1=(WNDPROC)SetWindowLongPtr(GetDlgItem(pfr->hwndSelf,IDC_EDTFIND),GWLP_WNDPROC,(LONG_PTR)ScintillaSubclassProc1);
     if ((pfr->PersistentFlags&FRP_AUTOGRABFIND) && !(pfr->PersistentFlags&FRC_FINDINCREMENTAL) ) {
       unsigned uSellen=SENDMSGTOED(pfr->hwndEditor, SCI_GETSELTEXT, 0, NULL)-1; // NUL byte not included
       if (!uSellen) { // get current word
@@ -1367,7 +1368,9 @@ static int __cdecl PopFindReplaceCallback(unsigned uCommand,LPFINDREPLACEX pVoid
         uSellen=epWord2-epWord1; // NUL not included here
         //MessageBoxFree(pfr->hwndSelf,smprintf(TEXT("epCurpos:%u epWord1:%u epWord2:%u uSellen:%u"),epCurpos,epWord1,epWord2,uSellen),TEXT("???"),MB_OK);
         if (uSellen) {
-          armreallocsafe(&pfr->lpstrFindWhat,&pfr->wFindWhatSz,uSellen+1,ARMSTRATEGY_MAINTAIN,0,"PopFindReplaceCallback");
+		  tsize_t findWhatSz = pfr->wFindWhatSz;
+          armreallocsafe(&pfr->lpstrFindWhat,&findWhatSz,uSellen+1,ARMSTRATEGY_MAINTAIN,0,"PopFindReplaceCallback");
+		  pfr->wFindWhatSz = findWhatSz;
           if (pfr->lpstrFindWhat) {
             struct TextRange tr;
             tr.lpstrText=pfr->lpstrFindWhat; tr.chrg.cpMin=epWord1; tr.chrg.cpMax=epWord2;
@@ -1384,13 +1387,15 @@ static int __cdecl PopFindReplaceCallback(unsigned uCommand,LPFINDREPLACEX pVoid
           pfr->uCol2=uCol2;
           SetWindowTextFree(GetDlgItem(pfr->hwndSelf,IDC_EDTCOLUMNS),smprintf("%u-%u columns",uCol1,uCol2));
         }
-        armreallocsafe(&pfr->lpstrFindWhat,&pfr->wFindWhatSz,uSellen+1,ARMSTRATEGY_MAINTAIN,0,"PopFindReplaceCallback");
-        if (pfr->lpstrFindWhat) pfr->wFindWhatLen=SENDMSGTOED(pfr->hwndEditor, SCI_GETSELTEXT, 0, pfr->lpstrFindWhat)-1;
+		tsize_t findWhatSz = pfr->wFindWhatSz;
+		armreallocsafe(&pfr->lpstrFindWhat, &findWhatSz, uSellen + 1, ARMSTRATEGY_MAINTAIN, 0, "PopFindReplaceCallback");
+		pfr->wFindWhatSz = findWhatSz;
+		if (pfr->lpstrFindWhat) pfr->wFindWhatLen = SENDMSGTOED(pfr->hwndEditor, SCI_GETSELTEXT, 0, pfr->lpstrFindWhat) - 1;
       }
     }
     int iCodePage=SENDMSGTOED(pfr->hwndEditor,SCI_GETCODEPAGE,0,0);
     SetWindowTextUTF8(pfr,GetDlgItem(pfr->hwndSelf,IDC_EDTFIND),pfr->lpstrFindWhat,pfr->wFindWhatLen,iCodePage);
-    g_wpScintillaOrigProc2=(WNDPROC)SetWindowLong(GetDlgItem(pfr->hwndSelf,IDC_EDTREPLACE),GWL_WNDPROC,(LONG)ScintillaSubclassProc2);
+    g_wpScintillaOrigProc2=(WNDPROC)SetWindowLongPtr(GetDlgItem(pfr->hwndSelf,IDC_EDTREPLACE),GWLP_WNDPROC,(LONG_PTR)ScintillaSubclassProc2);
     SetWindowTextUTF8(pfr,GetDlgItem(pfr->hwndSelf,IDC_EDTREPLACE),pfr->lpstrReplaceWith,pfr->wReplaceWithLen,iCodePage);
     SetWindowTextFree(GetDlgItem(pfr->hwndSelf,stc1),smprintf("^I=Tab ^M=Return (%s)",(pfr->InternalFlags&FRI_UNICODE)?"UNICODE":"ANSI"));
     } break;
